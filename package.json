@@ -1,0 +1,55 @@
+{
+  "name": "@rcharmeyer/react-utils",
+  "version": "0.0.1",
+  "description": "Reed's react utilities",
+  "license": "MIT",
+  "author": "Reed Harmeyer <rcharmeyer@gmail.com>",
+  "homepage": "https://github.com/rcharmeyer/react-utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rcharmeyer/react-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rcharmeyer/react-utils/issues"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/lodash-es": "^4.17.6",
+    "@types/react": "^18.0.0",
+    "@types/shallowequal": "^1.1.1",
+    "@vitejs/plugin-react": "^2.0.0",
+    "jsdom": "^21.1.1",
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0",
+    "shallowequal": "^1.1.0",
+    "typescript": "5.0.3",
+    "vite": "^3.0.0",
+    "vitest": "0.29.8"
+  },
+  "peerDependencies": {
+    "lodash-es": "^4.17.21",
+    "react": "^18.0.0"
+  }
+}
