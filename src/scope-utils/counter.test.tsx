@@ -7,11 +7,9 @@ import { render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
 import { useEvent, useStruct } from "../hooks"
-import { createScope } from "../scope"
+import { createScope, RootScope } from "../scope"
 
 import { hoist } from "./index"
-import { RootScope } from "../scope/root-scope"
-
 
 const CounterScope = createScope ()
 

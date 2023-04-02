@@ -15,6 +15,7 @@ export { createProvider } from "./provider"
 export {
   createScope,
   createStore,
+  RootScope,
   useStore,
 } from "./scope"
 
