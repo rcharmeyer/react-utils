@@ -46,11 +46,7 @@ export function useScopeExists (scope: Scope) {
 export function useLowestScopeIn (consumerScopes: Scope[]) {
   const ancestorScopes = useContext (ScopesContext)
 
-  const scope = useMemo (() => {
+  return useMemo (() => {
     return ancestorScopes.find ((s) => consumerScopes.includes (s))
   }, [ ancestorScopes, consumerScopes ])
-
-  if (!scope) throw new Error ("No scope was found")
-
-  return scope
 }

@@ -8,10 +8,15 @@ import react from "@vitejs/plugin-react"
 export default defineConfig({
   plugins: [react(), dts({ insertTypesEntry: true })],
   build: {
+    minify: false,
+    sourcemap: true,
     lib: {
       entry: resolve (__dirname, "./src/index.tsx"),
       fileName: "index",
       formats: ["cjs", "es"],
+    },
+    rollupOptions: {
+      external: ["react"],
     }
   },
   test: {
