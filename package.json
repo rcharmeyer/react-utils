@@ -1,6 +1,6 @@
 {
   "name": "@rcharmeyer/react-utils",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Reed's react utilities",
   "license": "MIT",
   "author": "Reed Harmeyer <rcharmeyer@gmail.com>",
@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "vite build",
+    "prepublishOnly": "npm run build",
     "test": "vitest"
   },
   "devDependencies": {
@@ -46,7 +47,8 @@
     "shallowequal": "^1.1.0",
     "typescript": "5.0.3",
     "vite": "^3.0.0",
-    "vitest": "0.29.8"
+    "vite-plugin-dts": "^2.1.0",
+    "vitest": "^0.29.8"
   },
   "peerDependencies": {
     "lodash-es": "^4.17.21",
