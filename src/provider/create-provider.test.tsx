@@ -1,14 +1,14 @@
 import "@testing-library/jest-dom"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { beforeEach, expect, test } from 'vitest'
 
 import { render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
+import { useEvent, useStruct } from "../hooks"
+
 import { createProvider } from "./create-provider"
-import { useEvent } from "../hooks"
-import { useStruct } from "../hooks"
 
 const [ CounterProvider, useCountState ] = createProvider (() => {
   const [ count, setCount ] = useState (0)

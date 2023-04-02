@@ -1,16 +1,19 @@
-import { createContext, memo, useContext } from "react"
+import { PropsWithChildren, createContext, memo, useContext } from "react"
 
-type Func = (...args: any) => any
+type Func = (arg: any) => any
 
-export function createProvider <T extends Func> (hook: T) {
-  const context = createContext <ReturnType <T>> (null as any)
+export function createProvider <T, P = {}> (hook: (arg: P) => T) {
+  const context = createContext <T> (null as any)
   const ContextProvider = memo (context.Provider)
 
-  const Provider = (props: { children: React.ReactNode }) => {
-    const value = hook()
+  const Provider = ({
+    children,
+    ...props
+  }: PropsWithChildren <P>) => {
+    const value = hook (props as P)
     return (
       <ContextProvider value={value}>
-        {props.children}
+        {children}
       </ContextProvider>
     )
   }

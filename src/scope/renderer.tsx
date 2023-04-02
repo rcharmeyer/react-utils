@@ -1,6 +1,7 @@
 import { ComponentType, PureComponent } from "react"
-import { Snapshot } from "./types"
 import { setDebugLabelListener } from "../debug-label"
+
+import { Snapshot } from "./types"
 
 export type RendererParams = {
   hook: () => any,
