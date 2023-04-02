@@ -2,6 +2,7 @@ import React, { createContext, PropsWithChildren, useContext, useMemo } from "re
 import { Scope } from "./types"
 
 const ScopesContext = createContext <Scope[]> ([])
+ScopesContext.displayName = "ScopesContext"
 
 export function ScopeProvider (props: PropsWithChildren <{ scope: Scope }>) {
   const scopes = useContext (ScopesContext)
@@ -17,20 +18,36 @@ export function ScopeProvider (props: PropsWithChildren <{ scope: Scope }>) {
   )
 }
 
+/**
+ * @param scope - The scope that is expected
+ * @returns if the scope exists
+ * 
+ * @example
+ * ```js
+ * const CounterScope = createScope ()
+ * 
+ * function useAssertCounterScopeExists () {
+ *   const exists = useScopeExists (CounterScope)
+ *   if (!exists) throw new Error ("CounterScope does not exist")
+ * }
+ * 
+ * // useCountState is only valid within CounterScope
+ * const useCountState = hoist (() => {
+ *   useAssertCounterScopeExists ()
+ *   // ...
+ * }, [ CounterScope ])
+ * ```
+ */
+export function useScopeExists (scope: Scope) {
+  const scopes = useContext (ScopesContext)
+  return scopes.includes (scope)
+}
+
 export function useLowestScopeIn (consumerScopes: Scope[]) {
   const ancestorScopes = useContext (ScopesContext)
 
-  if (!consumerScopes.length) throw new Error ("No scopes were found for the store")
-
   const scope = useMemo (() => {
-    const inStore = (s: Scope) => consumerScopes.includes (s)
-    const inScope = (s: Scope) => ancestorScopes.includes (s)
-
-    if (! consumerScopes.every (inScope)) {
-      throw new Error ("Some scopes from store were not found")
-    }
-
-    return ancestorScopes.find (inStore)
+    return ancestorScopes.find ((s) => consumerScopes.includes (s))
   }, [ ancestorScopes, consumerScopes ])
 
   if (!scope) throw new Error ("No scope was found")

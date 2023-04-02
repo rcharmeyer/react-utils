@@ -1,40 +1,23 @@
 import { memoize } from "lodash-es"
-import React, { createContext, memo, PropsWithChildren, PureComponent, Suspense, useMemo, useState } from "react"
+import React, { createContext, memo, PropsWithChildren, Suspense } from "react"
+
+import { useInitial } from "../hooks"
+
 import { createInternalListStore, createInternalStore, useInternalStore } from "./internal-store"
+import { RendererParams, createRenderer } from "./renderer"
 import { ScopeProvider } from "./scopes-context"
 import { Scope, Snapshot, StoreBuilder } from "./types"
 
-type RendererProps = {
-  hook: () => any,
-  onChange: (snapshot: Snapshot) => void,
-}
-
-function HookRenderer (props: RendererProps) {
-  const result = props.hook()
-  props.onChange ({ result })
-  return null
-}
-
-class StoreRenderer extends PureComponent <RendererProps> {
-  componentDidCatch (thrown: any) {
-    this.props.onChange ({ thrown })
-  }
-
-  render () {
-    return <HookRenderer {...this.props} />
-  }
-}
-
 export function createScope () {
+  // TODO: does Context.Provider need to be memoized?
   const InternalContext = createContext <StoreBuilder> (undefined as any)
-  InternalContext.Provider = memo (InternalContext.Provider)
 
-  const scope: Partial<Scope> = memo ((props: PropsWithChildren) => {    
-    const rendererListStore = useMemo (() => {
-      return createInternalListStore <RendererProps> ()
-    }, [])
+  const scope: Partial<Scope> = memo ((props: PropsWithChildren) => {
+    const rendererListStore = useInitial (() => {
+      return createInternalListStore <RendererParams> ()
+    })
 
-    const [ getStore ] = useState (() => memoize ((hook) => {
+    const getStore = useInitial (() => memoize ((hook) => {
       if (!hook) throw new Error ("hook not found")
 
       let onInitResolve: VoidFunction
@@ -60,11 +43,14 @@ export function createScope () {
       return hookStore
     }))
 
+    const rendererOf = useInitial (() => memoize (createRenderer))
+
     const renderers = useInternalStore (rendererListStore)
 
-    const renderedStores = renderers.map ((rendererProps, i) => (
-      <StoreRenderer key={i} {...rendererProps} />
-    ))
+    const renderedStores = renderers.map ((params) => {
+      const Renderer = rendererOf (params)
+      return <Renderer />
+    })
 
     return (
       <InternalContext.Provider value={getStore}>
@@ -78,8 +64,26 @@ export function createScope () {
     )
   })
 
-  // TODO: Support imperfect scoping
+  // TODO: should scopes be optional?
   scope.context = InternalContext
+
+  Object.defineProperty (scope, "Context", {
+    get () {
+      return InternalContext
+    }
+  })
+
+  let displayName = "UnknownScope"
+
+  Object.defineProperty (scope, "displayName", {
+    get () {
+      return displayName
+    },
+    set (name) {
+      displayName = name
+      InternalContext.displayName = `${name}.Context`
+    }
+  })
 
   return scope as Scope
 }

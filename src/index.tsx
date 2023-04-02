@@ -1,3 +1,7 @@
+export { createLoader } from "./async"
+
+export { useDebugLabel, setDebugLabelListener } from "./debug-label"
+
 export {
   useEvent,
   useInitial,
@@ -6,12 +10,14 @@ export {
   useStruct,
 } from "./hooks"
 
-export { createLoader } from "./async"
-
 export {
   createScope,
   createStore,
-  createStoreFamily,
-  hoist,
   useStore,
 } from "./scope"
+
+export {
+  createStoreFamily,
+  hoist,
+  PageScope,
+} from "./scope-utils"

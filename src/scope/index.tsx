@@ -1,7 +1,9 @@
 export { createScope } from "./create-scope"
 export {
   createStore,
-  createStoreFamily,
-  hoist,
   useStore,
 } from "./store"
+export type {
+  Scope,
+  Store,
+} from "./types"

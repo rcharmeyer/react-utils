@@ -6,14 +6,16 @@ import { beforeEach, expect, test } from 'vitest'
 import { render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
-import { createScope, createStore, useStore } from "./index"
-import { useEvent } from "../hooks"
-import { useStruct } from "../hooks"
-import { RootScope } from "./root-scope"
+import { useEvent, useStruct } from "../hooks"
+import { createScope } from "../scope"
+
+import { hoist } from "./index"
+import { RootScope } from "../scope/root-scope"
+
 
 const CounterScope = createScope ()
 
-const countStore = createStore (() => {
+const useCountState = hoist (() => {
   const [ count, setCount ] = useState (0)
 
   const increment = useEvent (() => {
@@ -26,7 +28,7 @@ const countStore = createStore (() => {
 function Counter (props: {
   testId: string,
 }) {
-  const { count, increment } = useStore (countStore) 
+  const { count, increment } = useCountState () 
 
   const buttonId = `${props.testId}-button`
   return (
