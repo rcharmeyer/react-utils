@@ -10,6 +10,8 @@ export {
   useStruct,
 } from "./hooks"
 
+export { createProvider } from "./provider"
+
 export {
   createScope,
   createStore,
