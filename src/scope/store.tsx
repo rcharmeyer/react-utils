@@ -5,18 +5,32 @@ import { useContext } from "react"
 import { useInternalStore } from "./internal-store"
 import { RootScope } from "./root-scope"
 
-export function createStore <T> (hook: () => T, scopes?: Scope[]): Store<T> {
-  scopes ??= []
-  const copyOfScopes = [...scopes]
+export type Scopable = Scope | { scopes: Scope[] }
 
-  return {
+export function asScopable <T> (res: T, scopes?: Scopable[]) {
+  scopes ??= []
+  const resolvedScopes = scopes
+    .map ((s: any) => s.scopes ? s.scopes : [ s ])
+    .flat ()
+
+  Object.defineProperty (res, "scopes", {
+    get () {
+      return resolvedScopes
+    }
+  })
+
+  return res as T & {
+    scopes: Scope[]
+  }
+}
+
+export function createStore <T> (hook: () => T, scopes?: Scopable[]): Store<T> {
+  const res = {
     get hook () {
       return hook
-    },
-    get scopes () {
-      return copyOfScopes
     }
   }
+  return asScopable (res, scopes)
 }
 
 export function useStore <T> (store: Store <T>): T {
@@ -25,7 +39,7 @@ export function useStore <T> (store: Store <T>): T {
 
   const scope = useLowestScopeIn (store.scopes) ?? RootScope
 
-  const getStoreInstance = useContext (scope.context)
+  const getStoreInstance = useContext (scope.Context)
   const { result, thrown } = useInternalStore (getStoreInstance (store.hook))
 
   if (thrown) throw thrown

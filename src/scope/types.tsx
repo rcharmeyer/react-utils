@@ -16,7 +16,7 @@ export type InternalStore <T> = {
 export type StoreBuilder = (func: Func) => InternalStore <Snapshot>
 
 export type Scope = ComponentType <PropsWithChildren> & {
-  context: React.Context <StoreBuilder>,
+  Context: React.Context <StoreBuilder>,
 }
 
 export type Store <T> = {

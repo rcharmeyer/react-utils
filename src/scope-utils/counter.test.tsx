@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { beforeEach, expect, test } from 'vitest'
 
-import { render, screen } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
 import { useEvent, useStruct } from "../hooks"
@@ -23,6 +23,12 @@ const useCountState = hoist (() => {
   return useStruct ({ count, increment })
 }, [ CounterScope ])
 
+/* TODO: determine why this doesn't work
+const useCountState = hoist (() => {
+  return _useCountState ()
+}, [ CounterScope ])
+*/
+
 function Counter (props: {
   testId: string,
 }) {
@@ -37,18 +43,24 @@ function Counter (props: {
   )
 }
 
+const Loading = () => (
+  <div>Loading...</div>
+)
+
 const App = () => (
   <RootScope>
-    <article>
-      <CounterScope>
-        <Counter testId="alpha" />
-        <Counter testId="bravo" />
-      </CounterScope>
-      <CounterScope>
-        <Counter testId="gamma" />
-        <Counter testId="omega" />
-      </CounterScope>
-    </article>
+    <Suspense fallback={<Loading />}>
+      <article>
+        <CounterScope>
+          <Counter testId="alpha" />
+          <Counter testId="bravo" />
+        </CounterScope>
+        <CounterScope>
+          <Counter testId="gamma" />
+          <Counter testId="omega" />
+        </CounterScope>
+      </article>
+    </Suspense>
   </RootScope>
 )
 
@@ -60,12 +72,18 @@ function testCounter (key: string, expected: string) {
 
 beforeEach (async () => {
   render (<App />)
-  const button = await screen.findByTestId ("alpha-button")
-  await user.click (button)
+  // await screen.findByText ("Loading...")
 })
 
-// assert
-testCounter ("alpha", "1")
-testCounter ("bravo", "1")
-testCounter ("gamma", "0")
-testCounter ("omega", "0")
+describe ("incrementing", () => {
+  beforeEach (async () => {
+    const button = await screen.findByTestId ("alpha-button")
+    await user.click (button)
+  })
+
+  // assert
+  testCounter ("alpha", "1")
+  testCounter ("bravo", "1")
+  testCounter ("gamma", "0")
+  testCounter ("omega", "0")
+})

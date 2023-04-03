@@ -64,9 +64,6 @@ export function createScope () {
     )
   })
 
-  // TODO: should scopes be optional?
-  scope.context = InternalContext
-
   Object.defineProperty (scope, "Context", {
     get () {
       return InternalContext
