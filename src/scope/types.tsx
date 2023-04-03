@@ -21,5 +21,5 @@ export type Scope = ComponentType <PropsWithChildren> & {
 
 export type Store <T> = {
   hook: () => T,
-  deps: Scope[],
+  scopes: Scope[],
 }

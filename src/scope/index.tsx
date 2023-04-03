@@ -7,6 +7,8 @@ export {
   useStore,
 } from "./store"
 
+export { useScopeExists } from "./scopes-context"
+
 export type {
   Scope,
   Store,
