@@ -40,7 +40,7 @@ export function useStore <T> (store: Store <T>): T {
   const scope = useLowestScopeIn (store.scopes) ?? RootScope
 
   const getStoreInstance = useContext (scope.Context)
-  const { result, thrown } = useInternalStore (getStoreInstance (store.hook))
+  const { result, thrown } = useInternalStore (getStoreInstance (store))
 
   if (thrown) throw thrown
   return result

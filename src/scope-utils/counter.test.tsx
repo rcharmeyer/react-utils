@@ -13,7 +13,7 @@ import { hoist } from "./index"
 
 const CounterScope = createScope ()
 
-const useCountState = hoist (() => {
+const useCountStore = hoist (() => {
   const [ count, setCount ] = useState (0)
 
   const increment = useEvent (() => {
@@ -23,11 +23,9 @@ const useCountState = hoist (() => {
   return useStruct ({ count, increment })
 }, [ CounterScope ])
 
-/* TODO: determine why this doesn't work
 const useCountState = hoist (() => {
-  return _useCountState ()
+  return useCountStore ()
 }, [ CounterScope ])
-*/
 
 function Counter (props: {
   testId: string,
@@ -72,7 +70,6 @@ function testCounter (key: string, expected: string) {
 
 beforeEach (async () => {
   render (<App />)
-  // await screen.findByText ("Loading...")
 })
 
 describe ("incrementing", () => {

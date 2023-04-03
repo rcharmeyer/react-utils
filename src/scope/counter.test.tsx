@@ -1,14 +1,13 @@
 import "@testing-library/jest-dom"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { beforeEach, expect, test } from 'vitest'
 
-import { render, screen } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
 import { createScope, createStore, useStore } from "./index"
-import { useEvent } from "../hooks"
-import { useStruct } from "../hooks"
+import { useEvent, useStruct } from "../hooks"
 import { RootScope } from "./root-scope"
 
 const CounterScope = createScope ()
@@ -23,10 +22,16 @@ const countStore = createStore (() => {
   return useStruct ({ count, increment })
 }, [ CounterScope ])
 
+const _countStore = createStore (() => {
+  return useStore (countStore)
+}, [ CounterScope ])
+
+const useCountState = () => useStore (_countStore)
+
 function Counter (props: {
   testId: string,
 }) {
-  const { count, increment } = useStore (countStore) 
+  const { count, increment } = useCountState () 
 
   const buttonId = `${props.testId}-button`
   return (
@@ -37,18 +42,24 @@ function Counter (props: {
   )
 }
 
+const Loading = () => (
+  <div>Loading...</div>
+)
+
 const App = () => (
   <RootScope>
-    <article>
-      <CounterScope>
-        <Counter testId="alpha" />
-        <Counter testId="bravo" />
-      </CounterScope>
-      <CounterScope>
-        <Counter testId="gamma" />
-        <Counter testId="omega" />
-      </CounterScope>
-    </article>
+    <Suspense fallback={<Loading />}>
+      <article>
+        <CounterScope>
+          <Counter testId="alpha" />
+          <Counter testId="bravo" />
+        </CounterScope>
+        <CounterScope>
+          <Counter testId="gamma" />
+          <Counter testId="omega" />
+        </CounterScope>
+      </article>
+    </Suspense>
   </RootScope>
 )
 
@@ -60,12 +71,17 @@ function testCounter (key: string, expected: string) {
 
 beforeEach (async () => {
   render (<App />)
-  const button = await screen.findByTestId ("alpha-button")
-  await user.click (button)
 })
 
-// assert
-testCounter ("alpha", "1")
-testCounter ("bravo", "1")
-testCounter ("gamma", "0")
-testCounter ("omega", "0")
+describe ("incrementing", () => {
+  beforeEach (async () => {
+    const button = await screen.findByTestId ("alpha-button")
+    await user.click (button)
+  })
+
+  // assert
+  testCounter ("alpha", "1")
+  testCounter ("bravo", "1")
+  testCounter ("gamma", "0")
+  testCounter ("omega", "0")
+})
