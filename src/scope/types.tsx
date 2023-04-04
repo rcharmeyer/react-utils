@@ -13,6 +13,7 @@ export type InternalStore <T> = {
   write: (arg: T) => void,
 }
 
+// export type StoreBuilder = (store: Store <any>) => Promise <InternalStore <Snapshot>>
 export type StoreBuilder = (store: Store <any>) => InternalStore <Snapshot>
 
 export type Scope = ComponentType <PropsWithChildren> & {

@@ -6,7 +6,7 @@ import { useInitial } from "../hooks"
 import { createInternalListStore, createInternalStore, useInternalStore } from "./internal-store"
 import { RendererParams, createRenderer } from "./renderer"
 import { ScopeProvider } from "./scopes-context"
-import { Scope, Snapshot, Store, StoreBuilder } from "./types"
+import { InternalStore, Scope, Snapshot, Store, StoreBuilder } from "./types"
 
 export function createScope () {
   // TODO: does Context.Provider need to be memoized?
@@ -41,6 +41,29 @@ export function createScope () {
       })
 
       return hookStore
+
+      /*
+      const thrown = new Error ("never")
+      const hookStore = createInternalStore <Snapshot> ({ thrown })
+
+      return new Promise <InternalStore <Snapshot>> ((resolve, reject) => {
+        try {
+          let initialized = false
+          hookStore.subscribe (() => {
+            if (initialized) return
+            initialized = true
+            resolve (hookStore)
+          })
+
+          rendererListStore.add ({
+            store,
+            onChange: hookStore.write,
+          })
+        } catch (e) {
+          reject (e)
+        }
+      })
+      */
     }))
 
     const rendererOf = useInitial (() => memoize (createRenderer))

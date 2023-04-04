@@ -2,7 +2,7 @@ import "@testing-library/jest-dom"
 
 import { expect, test } from 'vitest'
 
-import { render, screen } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import user from '@testing-library/user-event'
 
 import { createStore, useStore } from "./index"
@@ -27,8 +27,14 @@ const textStore2 = createStore (() => {
 
 textStore2.displayName = "textStore2"
 
+const textStore3 = createStore (() => {
+  return useStore (textStore2)
+})
+
+textStore3.displayName = "textStore3"
+
 const Text = () => {
-  const text = useStore (textStore2)
+  const text = useStore (textStore)
   return <div>{text}</div>
 }
 
@@ -42,9 +48,19 @@ const App = () => (
   </RootScope>
 )
 
+test ("skip loading...", async () => {
+  act (() => {
+    const { rerender } = render (<App />)
+    rerender (<App />)
+  })
+  expect (screen.queryByText ("Loading...")).not.toBeInTheDocument ()
+})
+
 test ("root doesn't cause a crash", async () => {
-  render (<App />)
-  expect (screen.queryByText ("Loading...")).toBeInTheDocument ()
+  act (() => {
+    const { rerender } = render (<App />)
+    rerender (<App />)
+  })
 
   const el = await screen.findByText ("a")
   expect (el).toBeInTheDocument ()

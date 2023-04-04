@@ -4,6 +4,7 @@ import { useLowestScopeIn, useScopeExists } from "./scopes-context"
 import { useContext } from "react"
 import { useInternalStore } from "./internal-store"
 import { RootScope } from "./root-scope"
+import { readPromise } from "../async/read-promise"
 
 export type Scopable = Scope | { scopes: Scope[] }
 
@@ -40,7 +41,9 @@ export function useStore <T> (store: Store <T>): T {
   const scope = useLowestScopeIn (store.scopes) ?? RootScope
 
   const getStoreInstance = useContext (scope.Context)
-  const { result, thrown } = useInternalStore (getStoreInstance (store))
+  const instance = getStoreInstance (store)
+  // const instance = readPromise (getStoreInstance (store))
+  const { result, thrown } = useInternalStore (instance)
 
   if (thrown) throw thrown
   return result

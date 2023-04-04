@@ -1,7 +1,8 @@
-import { ComponentType, PureComponent, Suspense, useEffect } from "react"
+import { ComponentType, PureComponent, Suspense, useEffect, useInsertionEffect, useRef } from "react"
 import { setDebugLabelListener } from "../debug-label"
 
 import { Snapshot, Store } from "./types"
+import { useInitial } from "../hooks"
 
 export type RendererParams = {
   store: Store <any>,
@@ -13,22 +14,20 @@ export function createRenderer (params: RendererParams) {
   let onChange = params.onChange
 
   const HookRenderer: ComponentType <{}> = () => {
-    const cleanup = setDebugLabelListener (setLabel)
+    // const cleanup = setDebugLabelListener (setLabel)
 
-    try {
-      const result = store.hook()
-      useEffect (() => {
-        onChange ({ result })
-      }, [ result ])
-      return null
-    }
-    finally {
-      cleanup()
-    }
+    const result = store.hook()
+    onChange ({ result })
+    /*
+    useEffect (() => {
+      onChange ({ result })
+    }, [ result ])
+    */
+    return null
   }
   
   const Fallback: ComponentType <{}> = () => {
-    useEffect (() => {
+    const onMount = () => {
       const thrown = new Promise <void> ((resolve, reject) => {
         let prevOnChange = onChange
         onChange = (snapshot) => {
@@ -45,7 +44,17 @@ export function createRenderer (params: RendererParams) {
       params.onChange ({
         thrown,
       })
+    }
+
+    useInitial (() => {
+      onMount ()
+    })
+
+    /*
+    useEffect (() => {
+      onMount ()
     }, [])
+    */
 
     return null
   }
@@ -72,6 +81,6 @@ export function createRenderer (params: RendererParams) {
     Renderer.displayName = `withRenderer(${label})`
   }
 
-  setLabel ("UnknownStore")
+  setLabel (store.displayName ?? "UnknownStore")
   return Renderer
 }
