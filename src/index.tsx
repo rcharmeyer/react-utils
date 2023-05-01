@@ -1,7 +1,5 @@
 export { createLoader } from "./async"
 
-export { useDebugLabel, setDebugLabelListener } from "./debug-label"
-
 export {
   useEvent,
   useInitial,

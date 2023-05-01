@@ -1,5 +1,5 @@
 import { memoize } from "lodash-es"
-import React, { createContext, memo, PropsWithChildren, Suspense } from "react"
+import { createContext, memo, PropsWithChildren, Suspense, useInsertionEffect, useReducer } from "react"
 
 import { useInitial } from "../hooks"
 
@@ -7,6 +7,7 @@ import { createInternalListStore, createInternalStore, useInternalStore } from "
 import { RendererParams, createRenderer } from "./renderer"
 import { ScopeProvider } from "./scopes-context"
 import { InternalStore, Scope, Snapshot, Store, StoreBuilder } from "./types"
+import { reactPromise } from "../async/read-promise"
 
 export function createScope () {
   // TODO: does Context.Provider need to be memoized?
@@ -20,33 +21,10 @@ export function createScope () {
     const getStore = useInitial (() => memoize ((store: Store <any>) => {
       if (!store.hook) throw new Error ("hook not found")
 
-      let onInitResolve: VoidFunction
-      const thrown = new Promise <void> ((resolve) => {
-        onInitResolve = () => {
-          resolve()
-        }
-      })
-
-      const hookStore = createInternalStore <Snapshot> ({ thrown })
-
-      // unsuspend after init
-      const onInitCleanup = hookStore.subscribe (() => {
-        onInitResolve ()
-        onInitCleanup ()
-      })
-
-      rendererListStore.add ({
-        store,
-        onChange: hookStore.write,
-      })
-
-      return hookStore
-
-      /*
       const thrown = new Error ("never")
       const hookStore = createInternalStore <Snapshot> ({ thrown })
 
-      return new Promise <InternalStore <Snapshot>> ((resolve, reject) => {
+      return reactPromise (new Promise <InternalStore <Snapshot>> ((resolve, reject) => {
         try {
           let initialized = false
           hookStore.subscribe (() => {
@@ -62,8 +40,7 @@ export function createScope () {
         } catch (e) {
           reject (e)
         }
-      })
-      */
+      }))
     }))
 
     const rendererOf = useInitial (() => memoize (createRenderer))

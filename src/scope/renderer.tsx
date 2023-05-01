@@ -1,5 +1,4 @@
-import { ComponentType, PureComponent, Suspense, useEffect, useInsertionEffect, useRef } from "react"
-import { setDebugLabelListener } from "../debug-label"
+import { ComponentType, PureComponent, Suspense } from "react"
 
 import { Snapshot, Store } from "./types"
 import { useInitial } from "../hooks"
@@ -14,15 +13,9 @@ export function createRenderer (params: RendererParams) {
   let onChange = params.onChange
 
   const HookRenderer: ComponentType <{}> = () => {
-    // const cleanup = setDebugLabelListener (setLabel)
-
     const result = store.hook()
     onChange ({ result })
-    /*
-    useEffect (() => {
-      onChange ({ result })
-    }, [ result ])
-    */
+    
     return null
   }
   
@@ -49,12 +42,6 @@ export function createRenderer (params: RendererParams) {
     useInitial (() => {
       onMount ()
     })
-
-    /*
-    useEffect (() => {
-      onMount ()
-    }, [])
-    */
 
     return null
   }
